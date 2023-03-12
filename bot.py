@@ -16,7 +16,6 @@ class ReactionRoleFlags(commands.FlagConverter):
 # CONSTANTS
 COMMAND_PREFIX = "%"
 GIVEAWAY_CHANNEL = 1084297203905994813
-GIVEAWAY_COMMAND = COMMAND_PREFIX + "g"
 GIVEAWAY_REACTION = "🎉"
 CANCEL_REACTION = "❌"
 
@@ -58,18 +57,13 @@ async def generate_reaction_roles(ctx, *, flags: ReactionRoleFlags):
         await message.add_reaction(bot.get_emoji(e))
 
 
-@bot.command()
+@bot.command(aliases=["g"])
 async def giveaway(ctx, obj):
     if ctx.channel.id == GIVEAWAY_CHANNEL:
         e = discord.Embed(title="Giveaway!", description=f"<@{ctx.author.id}> is giving away **{obj}**! React with {GIVEAWAY_REACTION} to join!")
         message = await ctx.send(embed=e)
         await message.add_reaction(GIVEAWAY_REACTION)
         await message.add_reaction(CANCEL_REACTION)
-
-
-@bot.command()
-async def test(ctx):
-    await ctx.send("asdfasdf")
 
 
 @bot.event
@@ -122,10 +116,6 @@ async def on_raw_reaction_remove(payload):
             if str(payload.emoji)[1:-1] in line:
                 await guild.get_member(payload.user_id).remove_roles(guild.get_role(role_id))
 
-
-@bot.event
-async def on_ready():
-    print("asdfasdf")
 
 
 bot.run(key)
