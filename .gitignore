@@ -3,6 +3,7 @@ key.txt
 
 #Giveaway data
 timedGiveaways.csv
+leaves.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

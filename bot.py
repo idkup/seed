@@ -9,6 +9,14 @@ import re
 from typing import Optional, Tuple
 
 
+# EMBED
+class EmbedFlags(commands.FlagConverter):
+    author: Optional[discord.Member]
+    title: Optional[str]
+    description: Optional[str]
+    color: Optional[int]
+
+
 # REACTION ROLES
 class ReactionRoleFlags(commands.FlagConverter):
     title: str
@@ -104,6 +112,20 @@ async def leafderboard(ctx):
     leaf_db["userID"] = leaf_db["userID"].map(lambda x: f"{bot.get_user(x).display_name}")
     leaf_db.sort_values(by="amount", ascending=False, inplace=True)
     await ctx.send(f"{leaf_db.to_string(index=False)}")
+
+
+@bot.command()
+async def embedmanual(ctx, *, flags: EmbedFlags):
+    e = discord.Embed()
+    if flags.author:
+        e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
+    if flags.title:
+        e.title = flags.title
+    if flags.description:
+        e.description = flags.description
+    if flags.color:
+        e.colour = flags.color
+    await ctx.send(embed=e)
 
 
 @bot.command()
