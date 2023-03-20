@@ -1,6 +1,9 @@
 #Key
 key.txt
 
+#Giveaway data
+timedGiveaways.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
