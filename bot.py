@@ -37,13 +37,13 @@ class TimedGiveawayFlags(commands.FlagConverter):
 
 # CONSTANTS
 COMMAND_PREFIX = "%"
-GARDEN_CHANNEL = 1084297203905994813
-LEAF_DROP_RATE = 0.2
-GIVEAWAY_CHANNEL = 1084297203905994813
+GARDEN_CHANNEL = 659956684642451463
+LEAF_DROP_RATE = 0.05
+GIVEAWAY_CHANNEL = 672496562164989983
 GIVEAWAY_REACTION = "🎉"
 CONFIRM_REACTION = "✅"
 CANCEL_REACTION = "❌"
-REACTION_ROLES_CHANNEL = 1084297203905994813
+REACTION_ROLES_CHANNEL = 726134052968726571
 
 # VARIABLES
 can_collect = False
@@ -83,7 +83,7 @@ async def leafbalance(ctx, user: Optional[discord.Member]):
     await ctx.send(f"{user.mention} has {balance} leaves.")
 
 
-@bot.command(aliases=["collect"])
+@bot.command(aliases=["collect", "c"])
 async def leafcollect(ctx):
     global can_collect
     if can_collect is True:
@@ -186,11 +186,16 @@ async def timedgiveaway(ctx, *, flags: TimedGiveawayFlags):
 async def on_message(msg):
     global can_collect
     await bot.process_commands(msg)
-    if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE:
+    if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user:
         can_collect = True
         e = discord.Embed(title="Leaves!", color=5763719, description=f"Some leaves have fallen in the garden. **{COMMAND_PREFIX}collect** to pick them up!")
+        e.set_footer(text="5")
         noti = await msg.channel.send(embed=e)
-        await asyncio.sleep(5)
+        for i in range(4):
+            await asyncio.sleep(1)
+            e.set_footer(text=f"{4-i}")
+            await noti.edit(embed=e)
+        await asyncio.sleep(1)
         await noti.delete()
         can_collect = False
 
