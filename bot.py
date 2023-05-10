@@ -124,8 +124,11 @@ async def leafderboard(ctx):
 
 @bot.command(aliases=["embed", "embededit"])
 async def embedmanual(ctx, *, flags: EmbedFlags):
-    if flags.channel and flags.msg_id:
-        channel = ctx.guild.get_channel(int(flags.channel))
+    if flags.msg_id:
+        if flags.channel:
+            channel = ctx.guild.get_channel(int(flags.channel))
+        else:
+            channel = ctx.channel.id
         message = await channel.fetch_message(int(flags.msg_id))
         e = message.embeds[0]
         if flags.author:
@@ -163,7 +166,10 @@ async def embedmanual(ctx, *, flags: EmbedFlags):
             e.set_footer(text=flags.footer_text, icon_url=flags.footer_icon)
         if flags.url:
             e.url = flags.url
-        await ctx.send(embed=e)
+        if not flags.channel:
+            await ctx.send(embed=e)
+        else:
+            await bot.get_channel(flags.channel).send(embed=e)
 
 
 @bot.command()
