@@ -15,6 +15,14 @@ class EmbedFlags(commands.FlagConverter):
     title: Optional[str]
     description: Optional[str]
     color: Optional[int]
+    image: Optional[str]
+    footer_text: Optional[str]
+    footer_icon: Optional[str]
+    url: Optional[str]
+    thumbnail: Optional[str]
+
+    channel: Optional[int]
+    msg_id: Optional[int]
 
 
 # REACTION ROLES
@@ -114,18 +122,48 @@ async def leafderboard(ctx):
     await ctx.send(f"{leaf_db.to_string(index=False)}")
 
 
-@bot.command()
+@bot.command(aliases=["embed", "embededit"])
 async def embedmanual(ctx, *, flags: EmbedFlags):
-    e = discord.Embed()
-    if flags.author:
-        e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
-    if flags.title:
-        e.title = flags.title
-    if flags.description:
-        e.description = flags.description
-    if flags.color:
-        e.colour = flags.color
-    await ctx.send(embed=e)
+    if flags.channel and flags.msg_id:
+        channel = ctx.guild.get_channel(int(flags.channel))
+        message = await channel.fetch_message(int(flags.msg_id))
+        e = message.embeds[0]
+        if flags.author:
+            e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
+        if flags.title:
+            e.title = flags.title
+        if flags.description:
+            e.description = flags.description
+        if flags.color:
+            e.colour = flags.color
+        if flags.image:
+            e.set_image(url=flags.image)
+        if flags.thumbnail:
+            e.set_thumbnail(url=flags.thumbnail)
+        if flags.footer_icon or flags.footer_text:
+            e.set_footer(text=flags.footer_text, icon_url=flags.footer_icon)
+        if flags.url:
+            e.url = flags.url
+        await message.edit(embed=e)
+    else:
+        e = discord.Embed()
+        if flags.author:
+            e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
+        if flags.title:
+            e.title = flags.title
+        if flags.description:
+            e.description = flags.description
+        if flags.color:
+            e.colour = flags.color
+        if flags.image:
+            e.set_image(url=flags.image)
+        if flags.thumbnail:
+            e.set_thumbnail(url=flags.thumbnail)
+        if flags.footer_icon or flags.footer_text:
+            e.set_footer(text=flags.footer_text, icon_url=flags.footer_icon)
+        if flags.url:
+            e.url = flags.url
+        await ctx.send(embed=e)
 
 
 @bot.command()
