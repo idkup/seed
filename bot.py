@@ -27,20 +27,20 @@ class EmbedFlags(commands.FlagConverter):
 
 # REACTION ROLES
 class ReactionRoleFlags(commands.FlagConverter):
-    title: str
-    emojis: Tuple[int, ...]
-    roles: Tuple[int, ...]
-    unique: bool = False
+    Title: str
+    Emojis: Tuple[int, ...]
+    Roles: Tuple[int, ...]
+    Unique: bool = False
 
 
 # TIMED GIVEAWAY
 class TimedGiveawayFlags(commands.FlagConverter):
-    gift: str
-    donor: Optional[discord.Member]
-    seconds: int = 0
-    minutes: int = 0
-    hours: int = 0
-    days: int = 0
+    Gift: str
+    Donor: Optional[discord.Member]
+    Seconds: int = 0
+    Minutes: int = 0
+    Hours: int = 0
+    Days: int = 0
 
 
 # CONSTANTS
@@ -185,17 +185,17 @@ async def embedsource(ctx, channel_id, message_id):
 
 @bot.command()
 async def generate_reaction_roles(ctx, *, flags: ReactionRoleFlags):
-    embed = discord.Embed(title=flags.title)
+    embed = discord.Embed(title=flags.Title)
     desc = ""
-    if flags.unique:
+    if flags.Unique:
         desc += "*You may only select one of the following roles.*\n"
     else:
         desc += "*You may select as many of the following roles as you please.*\n"
-    for e, r in zip(flags.emojis, flags.roles):
+    for e, r in zip(flags.Emojis, flags.Roles):
         desc += f"{bot.get_emoji(e)} <@&{r}>\n"
     embed.description = desc
     message = await bot.get_channel(REACTION_ROLES_CHANNEL).send(embed=embed)
-    for e in flags.emojis:
+    for e in flags.Emojis:
         await message.add_reaction(bot.get_emoji(e))
 
 
@@ -210,18 +210,18 @@ async def generate_reaction_roles(ctx, *, flags: ReactionRoleFlags):
 
 @bot.command(aliases=["tg", "g", "giveaway"])
 async def timedgiveaway(ctx, *, flags: TimedGiveawayFlags):
-    donor = flags.donor if flags.donor else ctx.author
+    donor = flags.Donor if flags.Donor else ctx.author
     if ctx.channel.id == GIVEAWAY_CHANNEL:
-        giveaway_end = datetime.datetime.now() + datetime.timedelta(days=flags.days, hours=flags.hours, minutes=flags.minutes, seconds=flags.seconds)
+        giveaway_end = datetime.datetime.now() + datetime.timedelta(days=flags.Days, hours=flags.Hours, minutes=flags.Minutes, seconds=flags.Seconds)
         epoch = int(giveaway_end.timestamp())
-        e = discord.Embed(title="Giveaway!", description=f"<@{donor.id}> is giving away **{flags.gift}**! React with {GIVEAWAY_REACTION} to join!\n This giveaway expires at <t:{epoch}>.")
+        e = discord.Embed(title="Giveaway!", description=f"<@{donor.id}> is giving away **{flags.Gift}**! React with {GIVEAWAY_REACTION} to join!\n This giveaway expires at <t:{epoch}>.")
         e.set_author(name=f"{donor.display_name}", icon_url=donor.display_avatar.url)
         message = await ctx.send(embed=e)
         await ctx.message.delete()
         await message.add_reaction(GIVEAWAY_REACTION)
         await message.add_reaction(CANCEL_REACTION)
         old_data = pd.read_csv('timedGiveaways.csv')
-        new_row = pd.DataFrame([[message.id, donor.id, epoch, flags.gift]], columns=["messageID", "userID", "expire", "gift"])
+        new_row = pd.DataFrame([[message.id, donor.id, epoch, flags.Gift]], columns=["messageID", "userID", "expire", "gift"])
         new_data = pd.concat([old_data, new_row])
         new_data.to_csv('timedGiveaways.csv', index=False)
 
