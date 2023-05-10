@@ -11,15 +11,15 @@ from typing import Optional, Tuple
 
 # EMBED
 class EmbedFlags(commands.FlagConverter):
-    author: Optional[discord.Member]
-    title: Optional[str]
-    description: Optional[str]
-    color: Optional[int]
-    image: Optional[str]
-    footer_text: Optional[str]
-    footer_icon: Optional[str]
-    url: Optional[str]
-    thumbnail: Optional[str]
+    Author: Optional[discord.Member]
+    Title: Optional[str]
+    Description: Optional[str]
+    Color: Optional[int]
+    Image: Optional[str]
+    FooterText: Optional[str]
+    FooterIcon: Optional[str]
+    URL: Optional[str]
+    Thumbnail: Optional[str]
 
     channel: Optional[int]
     msg_id: Optional[int]
@@ -131,41 +131,41 @@ async def embedmanual(ctx, *, flags: EmbedFlags):
             channel = ctx.channel
         message = await channel.fetch_message(int(flags.msg_id))
         e = message.embeds[0]
-        if flags.author:
-            e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
-        if flags.title:
-            e.title = flags.title
-        if flags.description:
-            e.description = flags.description
-        if flags.color:
-            e.colour = flags.color
-        if flags.image:
-            e.set_image(url=flags.image)
-        if flags.thumbnail:
-            e.set_thumbnail(url=flags.thumbnail)
-        if flags.footer_icon or flags.footer_text:
-            e.set_footer(text=flags.footer_text, icon_url=flags.footer_icon)
-        if flags.url:
-            e.url = flags.url
+        if flags.Author:
+            e.set_author(name=f"{flags.Author.display_name}", icon_url=flags.Author.display_avatar.url)
+        if flags.Title:
+            e.title = flags.Title
+        if flags.Description:
+            e.description = flags.Description
+        if flags.Color:
+            e.colour = flags.Color
+        if flags.Image:
+            e.set_image(url=flags.Image)
+        if flags.Thumbnail:
+            e.set_thumbnail(url=flags.Thumbnail)
+        if flags.FooterIcon or flags.FooterText:
+            e.set_footer(text=flags.FooterText, icon_url=flags.FooterIcon)
+        if flags.URL:
+            e.url = flags.URL
         await message.edit(embed=e)
     else:
         e = discord.Embed()
-        if flags.author:
-            e.set_author(name=f"{flags.author.display_name}", icon_url=flags.author.display_avatar.url)
-        if flags.title:
-            e.title = flags.title
-        if flags.description:
-            e.description = flags.description
-        if flags.color:
-            e.colour = flags.color
-        if flags.image:
-            e.set_image(url=flags.image)
-        if flags.thumbnail:
-            e.set_thumbnail(url=flags.thumbnail)
-        if flags.footer_icon or flags.footer_text:
-            e.set_footer(text=flags.footer_text, icon_url=flags.footer_icon)
-        if flags.url:
-            e.url = flags.url
+        if flags.Author:
+            e.set_author(name=f"{flags.Author.display_name}", icon_url=flags.Author.display_avatar.url)
+        if flags.Title:
+            e.title = flags.Title
+        if flags.Description:
+            e.description = flags.Description
+        if flags.Color:
+            e.colour = flags.Color
+        if flags.Image:
+            e.set_image(url=flags.Image)
+        if flags.Thumbnail:
+            e.set_thumbnail(url=flags.Thumbnail)
+        if flags.FooterIcon or flags.FooterText:
+            e.set_footer(text=flags.FooterText, icon_url=flags.FooterIcon)
+        if flags.URL:
+            e.url = flags.URL
         if not flags.channel:
             await ctx.send(embed=e)
         else:
