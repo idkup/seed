@@ -128,7 +128,7 @@ async def embedmanual(ctx, *, flags: EmbedFlags):
         if flags.channel:
             channel = ctx.guild.get_channel(int(flags.channel))
         else:
-            channel = ctx.channel.id
+            channel = ctx.channel
         message = await channel.fetch_message(int(flags.msg_id))
         e = message.embeds[0]
         if flags.author:
