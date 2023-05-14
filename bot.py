@@ -2,10 +2,13 @@ import asyncio
 import datetime
 import discord
 from discord.ext import commands
+from io import BytesIO
 import os
 import pandas as pd
+from PIL import Image, ImageOps
 import random
 import re
+import requests
 from typing import Optional, Tuple
 
 
@@ -21,8 +24,8 @@ class EmbedFlags(commands.FlagConverter):
     URL: Optional[str]
     Thumbnail: Optional[str]
 
-    channel: Optional[int]
-    msg_id: Optional[int]
+    Channel: Optional[int]
+    MSG_ID: Optional[int]
 
 
 # REACTION ROLES
@@ -52,6 +55,7 @@ GIVEAWAY_REACTION = "🎉"
 CONFIRM_REACTION = "✅"
 CANCEL_REACTION = "❌"
 REACTION_ROLES_CHANNEL = 726134052968726571
+WORKAROUND_CHANNEL = 1084297203905994813
 
 # VARIABLES
 can_collect = False
@@ -124,12 +128,12 @@ async def leafderboard(ctx):
 
 @bot.command(aliases=["embed", "embededit"])
 async def embedmanual(ctx, *, flags: EmbedFlags):
-    if flags.msg_id:
-        if flags.channel:
-            channel = ctx.guild.get_channel(int(flags.channel))
+    if flags.MSG_ID:
+        if flags.Channel:
+            channel = ctx.guild.get_channel(int(flags.Channel))
         else:
             channel = ctx.channel
-        message = await channel.fetch_message(int(flags.msg_id))
+        message = await channel.fetch_message(int(flags.MSG_ID))
         e = message.embeds[0]
         if flags.Author:
             e.set_author(name=f"{flags.Author.display_name}", icon_url=flags.Author.display_avatar.url)
@@ -166,11 +170,30 @@ async def embedmanual(ctx, *, flags: EmbedFlags):
             e.set_footer(text=flags.FooterText, icon_url=flags.FooterIcon)
         if flags.URL:
             e.url = flags.URL
-        if not flags.channel:
+        if not flags.Channel:
             await ctx.send(embed=e)
         else:
-            await bot.get_channel(flags.channel).send(embed=e)
+            await bot.get_channel(flags.Channel).send(embed=e)
 
+
+@bot.command()
+async def embedresize(ctx, channel_id, message_id, width):
+    channel = ctx.guild.get_channel(int(channel_id))
+    message = await channel.fetch_message(int(message_id))
+    embed = message.embeds[0]
+    image = Image.open(BytesIO(requests.get(embed.image.url).content)) if embed.image.url else Image.new(mode='RGBA', size=(100, 2), color=(0, 0, 0, 0))
+    image = image.convert("RGBA")
+    pad = (int(width) - image.width)//2
+    new_image = ImageOps.expand(image, border=(pad, 0, pad, 0), fill=(0, 0, 0, 0))
+
+    with BytesIO() as imb:
+        new_image.save(imb, 'PNG')
+        imb.seek(0)
+        temp_message = await ctx.guild.get_channel(WORKAROUND_CHANNEL).send(file=discord.File(fp=imb, filename='img.png'))
+    attach = temp_message.attachments[0]
+    embed.set_image(url=attach.url)
+    await message.edit(embed=embed)
+    await temp_message.delete()
 
 @bot.command()
 async def embedsource(ctx, channel_id, message_id):
