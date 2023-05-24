@@ -70,6 +70,7 @@ with open('key.txt', 'r') as k:
 
 
 @bot.command(aliases=["add"])
+@commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
 async def leafadd(ctx, user:discord.Member, amount: int):
     leaf_db = pd.read_csv('leaves.csv')
     if user.id not in leaf_db.userID.values:
@@ -208,6 +209,7 @@ async def embedsource(ctx, channel_id, message_id):
 
 
 @bot.command()
+@commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
 async def generate_reaction_roles(ctx, *, flags: ReactionRoleFlags):
     embed = discord.Embed(title=flags.Title)
     desc = ""
