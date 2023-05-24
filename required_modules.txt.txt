@@ -1,3 +1,0 @@
-discord >= 2.2.3
-PIL >= 1.0
-pandas >= 1.0
