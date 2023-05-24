@@ -195,6 +195,7 @@ async def embedresize(ctx, channel_id, message_id, width):
     await message.edit(embed=embed)
     await temp_message.delete()
 
+
 @bot.command()
 async def embedsource(ctx, channel_id, message_id):
     channel = ctx.guild.get_channel(int(channel_id))
