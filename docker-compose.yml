@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+
+  seed:
+    container_name: seed
+    build:
+      context: .
+    volumes:
+      - ./data:/app/data
