@@ -114,8 +114,6 @@ async def leafcollect(ctx):
         noti = await ctx.send(embed=e)
         await asyncio.sleep(5)
         await noti.delete()
-    else:
-        await ctx.author.send("Cannot collect leaves right now.")
     await ctx.message.delete()
 
 
