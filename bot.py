@@ -254,7 +254,7 @@ async def timedgiveaway(ctx, *, flags: TimedGiveawayFlags):
 async def on_message(msg):
     global can_collect
     await bot.process_commands(msg)
-    if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user:
+    if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user and can_collect is False:
         can_collect = True
         e = discord.Embed(title="Leaves!", color=5763719, description=f"Some leaves have fallen in the garden. **{COMMAND_PREFIX}collect** to pick them up!")
         e.set_footer(text="5")
