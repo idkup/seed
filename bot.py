@@ -49,7 +49,8 @@ class TimedGiveawayFlags(commands.FlagConverter):
 # CONSTANTS
 COMMAND_PREFIX = "%"
 GARDEN_CHANNEL = 659956684642451463
-LEAF_DROP_RATE = 0.02
+LEAF_DROP_RATE = 0.03
+MINIMUM_LEAF_COOLDOWN = 600  # seconds
 GIVEAWAY_CHANNEL = 672496562164989983
 GIVEAWAY_REACTION = "🎉"
 CONFIRM_REACTION = "✅"
@@ -59,6 +60,7 @@ WORKAROUND_CHANNEL = 1084297203905994813
 
 # VARIABLES
 can_collect = False
+last_executed = None
 
 intents = discord.Intents.default()
 intents.members = True
@@ -102,7 +104,7 @@ async def leafcollect(ctx):
     if can_collect is True:
         can_collect = False
         leaf_db = pd.read_csv('leaves.csv')
-        leaves = abs(int(20 * random.gauss(0, 1)))
+        leaves = min(int(20 * random.gauss(20, 10)), 1)
         if ctx.author.id not in leaf_db.userID.values:
             new_row = pd.DataFrame([[ctx.author.id, leaves]], columns=["userID", "amount"])
             leaf_db = pd.concat([leaf_db, new_row])
@@ -253,19 +255,22 @@ async def timedgiveaway(ctx, *, flags: TimedGiveawayFlags):
 @bot.event
 async def on_message(msg):
     global can_collect
+    global last_executed
     await bot.process_commands(msg)
-    if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user and can_collect is False:
-        can_collect = True
-        e = discord.Embed(title="Leaves!", color=5763719, description=f"Some leaves have fallen in the garden. **{COMMAND_PREFIX}collect** to pick them up!")
-        e.set_footer(text="5")
-        noti = await msg.channel.send(embed=e)
-        for i in range(4):
+    if last_executed is None or last_executed + datetime.timedelta(seconds=MINIMUM_LEAF_COOLDOWN) < datetime.datetime.now():
+        last_executed = datetime.datetime.now()
+        if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user and can_collect is False:
+            can_collect = True
+            e = discord.Embed(title="Leaves!", color=5763719, description=f"Some leaves have fallen in the garden. **{COMMAND_PREFIX}collect** to pick them up!")
+            e.set_footer(text="5")
+            noti = await msg.channel.send(embed=e)
+            for i in range(4):
+                await asyncio.sleep(1)
+                e.set_footer(text=f"{4-i}")
+                await noti.edit(embed=e)
             await asyncio.sleep(1)
-            e.set_footer(text=f"{4-i}")
-            await noti.edit(embed=e)
-        await asyncio.sleep(1)
-        await noti.delete()
-        can_collect = False
+            await noti.delete()
+            can_collect = False
 
 
 @bot.event
