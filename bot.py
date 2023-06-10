@@ -104,7 +104,7 @@ async def leafcollect(ctx):
     if can_collect is True:
         can_collect = False
         leaf_db = pd.read_csv('leaves.csv')
-        leaves = min(int(20 * random.gauss(20, 10)), 1)
+        leaves = min(int(2 * random.gauss(20, 10)), 1)
         if ctx.author.id not in leaf_db.userID.values:
             new_row = pd.DataFrame([[ctx.author.id, leaves]], columns=["userID", "amount"])
             leaf_db = pd.concat([leaf_db, new_row])
