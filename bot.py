@@ -258,9 +258,9 @@ async def on_message(msg):
     global last_executed
     await bot.process_commands(msg)
     if last_executed is None or (last_executed + datetime.timedelta(seconds=MINIMUM_LEAF_COOLDOWN) < datetime.datetime.now()):
-        last_executed = datetime.datetime.now()
         if msg.channel.id == GARDEN_CHANNEL and random.random() < LEAF_DROP_RATE and msg.author != bot.user and can_collect is False:
             can_collect = True
+            last_executed = datetime.datetime.now()
             e = discord.Embed(title="Leaves!", color=5763719, description=f"Some leaves have fallen in the garden. **{COMMAND_PREFIX}collect** to pick them up!")
             e.set_footer(text="5")
             noti = await msg.channel.send(embed=e)
