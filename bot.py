@@ -122,7 +122,7 @@ async def leafcollect(ctx):
 @bot.command()
 async def leafderboard(ctx):
     leaf_db = pd.read_csv('leaves.csv')
-    leaf_db["userID"] = leaf_db["userID"].map(lambda x: f"{bot.get_user(x).display_name}")
+    leaf_db["userID"] = leaf_db["userID"].map(lambda x: f"{bot.get_user(x).display_name if bot.get_user(x) else 'Error'}")
     leaf_db.sort_values(by="amount", ascending=False, inplace=True)
     await ctx.send(f"{leaf_db.head(25).to_string(index=False)}")
 
