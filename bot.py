@@ -44,6 +44,7 @@ class TimedGiveawayFlags(commands.FlagConverter):
     Minutes: int = 0
     Hours: int = 0
     Days: int = 0
+    Color: Optional[int]
 
 
 # CONSTANTS
@@ -122,7 +123,7 @@ async def leafcollect(ctx):
 @bot.command()
 async def leafderboard(ctx):
     leaf_db = pd.read_csv('leaves.csv')
-    leaf_db["userID"] = leaf_db["userID"].map(lambda x: f"{bot.get_user(x).display_name if bot.get_user(x) else 'Deleted Account'}")
+    leaf_db["userID"] = leaf_db["userID"].map(lambda x: f"{bot.get_user(x).display_name if bot.get_user(x) else 'deleted account'}")
     leaf_db.sort_values(by="amount", ascending=False, inplace=True)
     await ctx.send(f"```{leaf_db.head(25).to_string(index=False)}```")
 
@@ -241,7 +242,8 @@ async def timedgiveaway(ctx, *, flags: TimedGiveawayFlags):
         giveaway_end = datetime.datetime.now() + datetime.timedelta(days=flags.Days, hours=flags.Hours, minutes=flags.Minutes, seconds=flags.Seconds)
         epoch = int(giveaway_end.timestamp())
         e = discord.Embed(title="Giveaway!", description=f"<@{donor.id}> is giving away **{flags.Gift}**! React with {GIVEAWAY_REACTION} to join!\n This giveaway expires at <t:{epoch}>.")
-        e.set_author(name=f"{donor.display_name}", icon_url=donor.display_avatar.url)
+        if flags.Color:
+            e.colour = flags.Color
         message = await ctx.send(embed=e)
         await ctx.message.delete()
         await message.add_reaction(GIVEAWAY_REACTION)
@@ -280,14 +282,14 @@ async def on_raw_reaction_add(payload):
     message = await channel.fetch_message(payload.message_id)
     embeds = message.embeds
     # END GIVEAWAY
-    if payload.channel_id == GIVEAWAY_CHANNEL and str(payload.emoji) == CANCEL_REACTION and \
-            f"<@{payload.user_id}>" in embeds[0].description and message.author == bot.user:
-        active_giveaways = pd.read_csv("timedGiveaways.csv")
-        active_giveaways = active_giveaways.loc[int(active_giveaways["messageID"]) == message.id]
-        active_giveaways.to_csv('timedGiveaways.csv', index=False)
-        e = message.embeds[0]
-        e.description = "This giveaway was cancelled."
-        await message.edit(embed=e)
+    if payload.channel_id == GIVEAWAY_CHANNEL and str(payload.emoji) == CANCEL_REACTION:
+        if message.author == bot.user and guild.get_role(659958443943264257) in guild.get_member(payload.user_id).roles:
+            active_giveaways = pd.read_csv("timedGiveaways.csv")
+            active_giveaways = active_giveaways.loc[int(active_giveaways["messageID"]) == message.id]
+            active_giveaways.to_csv('timedGiveaways.csv', index=False)
+            e = message.embeds[0]
+            e.description = "This giveaway was cancelled."
+            await message.edit(embed=e)
     # REACTION ROLES
     if payload.channel_id == REACTION_ROLES_CHANNEL and message.author == bot.user:
         parse = embeds[0].description
