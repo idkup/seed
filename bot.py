@@ -285,7 +285,7 @@ async def on_raw_reaction_add(payload):
     if payload.channel_id == GIVEAWAY_CHANNEL and str(payload.emoji) == CANCEL_REACTION:
         if message.author == bot.user and guild.get_role(659958443943264257) in guild.get_member(payload.user_id).roles:
             active_giveaways = pd.read_csv("timedGiveaways.csv")
-            active_giveaways = active_giveaways.loc[int(active_giveaways["messageID"]) == message.id]
+            active_giveaways = active_giveaways.loc[active_giveaways["messageID"] != message.id]
             active_giveaways.to_csv('timedGiveaways.csv', index=False)
             e = message.embeds[0]
             e.description = "This giveaway was cancelled."
